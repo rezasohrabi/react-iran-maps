@@ -1,5 +1,54 @@
 import React from "react";
 
+export function GradientLegend({ scale, colors }: any) {
+  const domain = scale.domain();
+  const min = domain[0];
+  const max = domain[1];
+
+  if (!isFinite(min) || !isFinite(max)) {
+    return null;
+  }
+
+  const gradientStops = colors
+    .map((color: string, index: number) => {
+      const percent =
+        colors.length === 1
+          ? 100
+          : Math.round((index / (colors.length - 1)) * 100);
+      return `${color} ${percent}%`;
+    })
+    .join(", ");
+
+  return (
+    <div
+      className="legend gradient-legend"
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "center",
+        fontSize: 12,
+        direction: "ltr",
+      }}
+    >
+      {min === 0 ? (
+        <div>کمترین: ۰</div>
+      ) : (
+        <div>کمترین: {Intl.NumberFormat("fa-IR").format(Number(min))}</div>
+      )}
+      <div
+        style={{
+          width: 200,
+          height: 13,
+          borderRadius: 4,
+          overflow: "hidden",
+          backgroundImage: `linear-gradient(to right, ${gradientStops})`,
+        }}
+      />
+      <div>بیشترین: {Intl.NumberFormat("fa-IR").format(Number(max))}</div>
+    </div>
+  );
+}
+
 export function QuantitativeLegend({ scale }: any) {
   const range = scale.range();
 
@@ -7,12 +56,12 @@ export function QuantitativeLegend({ scale }: any) {
   const firstIndex = 0;
 
   const [minRaw] = scale.invertExtent(range[firstIndex]);
-  const [_, maxRaw] = scale.invertExtent(range[lastIndex]);
+  const [, maxRaw] = scale.invertExtent(range[lastIndex]);
 
-  const min = isFinite(minRaw) ? String(minRaw) : "";
-  const max = isFinite(maxRaw) ? String(maxRaw) : "";
+  const min = isFinite(minRaw) ? minRaw : null;
+  const max = isFinite(maxRaw) ? maxRaw : null;
 
-  if (!min && !max) {
+  if (min === null && max === null) {
     return null;
   }
 
@@ -27,27 +76,31 @@ export function QuantitativeLegend({ scale }: any) {
         direction: "ltr",
       }}
     >
-      {min && (
-        <div>کمترین: {Intl.NumberFormat("fa-IR").format(Number(min))} مطلب</div>
+      {min !== null && (
+        <div>
+          کمترین:{" "}
+          {min === 0 ? "۰" : Intl.NumberFormat("fa-IR").format(Number(min))}
+        </div>
       )}
+      {/* Discrete color blocks for quantize scale */}
       <div
-        style={{
-          display: "flex",
-          borderRadius: 4,
-          overflow: "hidden",
-        }}
+        style={{ display: "flex", gap: 0, borderRadius: 4, overflow: "hidden" }}
       >
         {range.map((color: string, index: number) => (
           <div
             key={index}
-            style={{ width: 37, height: 13, backgroundColor: color }}
+            style={{
+              width: 37,
+              height: 13,
+              backgroundColor: color,
+              borderLeft:
+                index > 0 ? "1px solid rgba(255,255,255,0.3)" : "none",
+            }}
           />
         ))}
       </div>
-      {max && (
-        <div>
-          بیشترین: {Intl.NumberFormat("fa-IR").format(Number(max))} مطلب
-        </div>
+      {max !== null && (
+        <div>بیشترین: {Intl.NumberFormat("fa-IR").format(Number(max))}</div>
       )}
     </div>
   );

@@ -12,3 +12,4 @@ export { CustomAspectRatioSample } from "./11-CustomAspectRatio";
 export { EnglishNamesSample } from "./12-EnglishNames";
 export { IncompleteDataSample } from "./13-IncompleteData";
 export { ZeroValuesSample } from "./14-ZeroValues";
+export { SequentialLegendsSample } from "./15-SequentialLegends";

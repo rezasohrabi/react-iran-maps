@@ -23,10 +23,11 @@ interface QuantitativeLegend {
   /** Color gradient from low to high */
   colors: string[];
   items?: never;
+  scaleType?: "quantize" | "sequential" | "linear";
 }
 
 /**
- * Legend for qualitative data (categorical values).
+ * Legend for qualitative data (c ategorical values).
  * @example { mode: "qualitative", items: [{ label: "Low", value: "low", color: "#FFF" }] }
  */
 interface QualitativeLegend {
@@ -34,6 +35,7 @@ interface QualitativeLegend {
   mode: "qualitative";
   items: LegendItem[];
   colors?: never;
+  scaleType?: never;
 }
 
 type LegendConfig = QuantitativeLegend | QualitativeLegend;

@@ -6,7 +6,13 @@ import React, {
   useRef,
 } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-import { scaleOrdinal, scaleQuantize } from "d3-scale";
+import {
+  scaleOrdinal,
+  scaleLinear,
+  scaleSequential,
+  scaleQuantize,
+} from "d3-scale";
+import { interpolateRgbBasis } from "d3-interpolate";
 
 import {
   useCurrentGeographies,
@@ -16,7 +22,11 @@ import {
 import { ChoroplethMapProps, ProvinceMapItem } from "../types";
 import { getProvinceName } from "../lib";
 import { Tooltip } from "./Tooltip";
-import { QualitativeLegend, QuantitativeLegend } from "./Legend";
+import {
+  QualitativeLegend,
+  QuantitativeLegend,
+  GradientLegend,
+} from "./Legend";
 import { animate } from "motion";
 import { Breadcrumbs } from "./Breadcrumbs";
 
@@ -59,12 +69,38 @@ export function ChoroplethMap({
     undefined
   );
 
-  const legendScale =
-    legend?.mode === "qualitative"
-      ? scaleOrdinal()
-          .domain(legend?.items?.map((item) => item.value))
-          .range(legend?.items?.map((item) => item.color))
-      : scaleQuantize<string>().domain([minRange, maxRange]).range(colorScale);
+  const scaleType =
+    legend?.mode === "quantitative"
+      ? legend.scaleType || "quantize"
+      : undefined;
+
+  let legendScale: any;
+
+  if (legend?.mode === "qualitative") {
+    legendScale = scaleOrdinal()
+      .domain((legend.items || []).map((item) => item.value))
+      .range((legend.items || []).map((item) => item.color));
+  } else if (scaleType === "quantize") {
+    legendScale = scaleQuantize<string>()
+      .domain([minRange, maxRange])
+      .range(colorScale);
+  } else if (scaleType === "sequential") {
+    legendScale = scaleSequential(
+      interpolateRgbBasis(colorScale as string[])
+    ).domain([minRange, maxRange]);
+  } else if (scaleType === "linear") {
+    legendScale = scaleLinear<string>()
+      .domain([minRange, maxRange])
+      .range([
+        colorScale[0] ?? "#fff",
+        colorScale[colorScale.length - 1] ?? "#000",
+      ])
+      .interpolate(() => interpolateRgbBasis(colorScale as string[]));
+  } else {
+    legendScale = scaleQuantize<string>()
+      .domain([minRange, maxRange])
+      .range(colorScale);
+  }
 
   const getColor = useCallback(
     (value?: number | string) => {
@@ -74,18 +110,51 @@ export function ChoroplethMap({
 
       if (legend?.mode === "qualitative") {
         return scaleOrdinal()
-          .domain(legend?.items?.map((item) => item.value))
-          .range(legend?.items?.map((item) => item.color))(value as string);
+          .domain((legend.items || []).map((item) => item.value))
+          .range((legend.items || []).map((item) => item.color))(
+          value as string
+        );
       }
 
       if (typeof value === "number") {
-        return scaleQuantize<string>()
-          .domain([minRange, maxRange])
-          .range(colorScale)(value);
+        const currentScaleType =
+          legend?.mode === "quantitative"
+            ? legend.scaleType || "quantize"
+            : "quantize";
+
+        if (currentScaleType === "linear") {
+          return scaleLinear<string>()
+            .domain([minRange, maxRange])
+            .range([
+              colorScale[0] ?? "#fff",
+              colorScale[colorScale.length - 1] ?? "#000",
+            ])
+            .interpolate(() => interpolateRgbBasis(colorScale as string[]))(
+            value
+          );
+        } else if (currentScaleType === "sequential") {
+          return scaleSequential(
+            interpolateRgbBasis(colorScale as string[])
+          ).domain([minRange, maxRange])(value);
+        } else {
+          // quantize (default)
+          return scaleQuantize<string>()
+            .domain([minRange, maxRange])
+            .range(colorScale)(value);
+        }
       }
     },
-    [minRange, maxRange, colorScale]
+    [
+      minRange,
+      maxRange,
+      colorScale,
+      legend?.mode,
+      legend?.items,
+      legend?.scaleType,
+    ]
   );
+
+  const currentGeographies = useCurrentGeographies(displayedProvince);
 
   useEffect(() => {
     if (legend?.mode === "quantitative") {
@@ -100,14 +169,18 @@ export function ChoroplethMap({
         (province) => +(province.value ?? 0)
       );
 
-      const min = Math.min(...values);
+      // Get total number of provinces/counties in the geography
+      const totalGeographies = currentGeographies.length;
+
+      // Check if some provinces/counties are missing data
+      const hasIncompleteCoverage = (data?.length || 0) < totalGeographies;
+
+      const min = hasIncompleteCoverage ? 0 : Math.min(...values);
       const max = Math.max(...values);
       setMinRange(min);
       setMaxRange(max);
     }
-  }, [displayedProvince]);
-
-  const currentGeographies = useCurrentGeographies(displayedProvince);
+  }, [displayedProvince, provinceMap, legend?.mode, data, currentGeographies]);
 
   const { optimalCenter, optimalScale } = useOptimalScale(
     selectedProvince,
@@ -289,7 +362,13 @@ export function ChoroplethMap({
           </Geographies>
         </ComposableMap>
         {!legend?.disable && legend?.mode === "quantitative" && (
-          <QuantitativeLegend scale={legendScale} />
+          <>
+            {scaleType === "linear" || scaleType === "sequential" ? (
+              <GradientLegend scale={legendScale} colors={colorScale} />
+            ) : (
+              <QuantitativeLegend scale={legendScale} />
+            )}
+          </>
         )}
         {!legend?.disable && legend?.mode === "qualitative" && (
           <QualitativeLegend scale={legendScale} />
