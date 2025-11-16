@@ -1,6 +1,6 @@
 {
   "name": "react-iran-maps",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": false,
   "description": "Create powerful React SVG maps of Iran based on d3-geo and topojson.",
   "main": "./dist/index.js",
