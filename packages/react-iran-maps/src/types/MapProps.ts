@@ -21,7 +21,7 @@ interface QuantitativeLegend {
   disable?: boolean;
   mode: "quantitative";
   /** Color gradient from low to high */
-  colors: string[];
+  colors?: string[];
   items?: never;
   scaleType?: "quantize" | "sequential" | "linear";
 }

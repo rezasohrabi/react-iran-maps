@@ -2,16 +2,37 @@ import { ChoroplethMap, ProvinceData } from "react-iran-maps";
 
 export function QuantitativeDefaultSample() {
   const quantitativeData: ProvinceData[] = [
-    { name: "تهران", value: 15000000 },
-    { name: "اصفهان", value: 5500000 },
-    { name: "خراسان رضوی", value: 6500000 },
-    { name: "فارس", value: 4800000 },
-    { name: "خوزستان", value: 4700000 },
-    { name: "آذربایجان شرقی", value: 3900000 },
-    { name: "مازندران", value: 3200000 },
-    { name: "آذربایجان غربی", value: 3200000 },
-    { name: "کرمان", value: 3100000 },
-    { name: "البرز", value: 2800000 },
+    { name: "تهران", value: 2000 },
+    { name: "اصفهان", value: 1800 },
+    { name: "خراسان رضوی", value: 1600 },
+    { name: "فارس", value: 1400 },
+    { name: "خوزستان", value: 1200 },
+    { name: "آذربایجان شرقی", value: 1000 },
+    { name: "مازندران", value: 900 },
+    { name: "آذربایجان غربی", value: 800 },
+    { name: "کرمان", value: 700 },
+    { name: "البرز", value: 600 },
+    { name: "گیلان", value: 550 },
+    { name: "کرمانشاه", value: 500 },
+    { name: "همدان", value: 450 },
+    { name: "اردبیل", value: 400 },
+    { name: "هرمزگان", value: 350 },
+    { name: "لرستان", value: 300 },
+    { name: "مرکزی", value: 280 },
+    { name: "گلستان", value: 260 },
+    { name: "کردستان", value: 240 },
+    { name: "بوشهر", value: 220 },
+    { name: "قزوین", value: 200 },
+    { name: "زنجان", value: 180 },
+    { name: "سمنان", value: 160 },
+    { name: "یزد", value: 140 },
+    { name: "چهارمحال و بختیاری", value: 120 },
+    { name: "سیستان و بلوچستان", value: 100 },
+    { name: "ایلام", value: 80 },
+    { name: "کهگیلویه و بویراحمد", value: 60 },
+    { name: "خراسان شمالی", value: 40 },
+    { name: "خراسان جنوبی", value: 20 },
+    { name: "قم", value: 0 },
   ];
 
   return (
@@ -27,11 +48,11 @@ export function QuantitativeDefaultSample() {
           data={quantitativeData}
           legend={{
             mode: "quantitative",
-            colors: ["#AADBDD", "#75C4C8", "#37AAAF", "#199DA3", "#16898E"],
+            colors: ["#fff", "#16898E"],
+            scaleType: "linear",
           }}
         />
       </div>
     </section>
   );
 }
-
