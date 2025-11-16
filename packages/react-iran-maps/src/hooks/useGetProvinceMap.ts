@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { CountyMapItem, ProvinceData, ProvinceMapItem } from "../types";
+import { normalizeProvinceName } from "../lib";
 
 export function useGetProvinceMap(data?: ProvinceData[]) {
   return useMemo(() => {
@@ -10,10 +11,14 @@ export function useGetProvinceMap(data?: ProvinceData[]) {
     const provinceMap: Record<string, ProvinceMapItem> = {};
 
     if (data) {
+      const language = data[0]?.name.match(/[a-zA-Z]/) ? "en" : "fa";
+
       data.forEach((province) => {
-        provinceMap[province.name] = {
+        const normalizedName = normalizeProvinceName(province.name, language);
+
+        provinceMap[normalizedName] = {
           value: province.value,
-          name: province.name,
+          name: normalizedName,
           counties: province.counties
             ? province.counties.reduce((countyMap: CountyMapItem, county) => {
                 countyMap[county.name] = county;

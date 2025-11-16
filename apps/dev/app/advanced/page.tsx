@@ -10,6 +10,7 @@ import {
   IncompleteDataSample,
   ZeroValuesSample,
   SequentialLegendsSample,
+  SpellingVariantsSample,
 } from "../samples";
 import { Navbar } from "../components/Navbar";
 
@@ -36,6 +37,7 @@ export default function AdvancedPage() {
           <IncompleteDataSample />
           <ZeroValuesSample />
           <SequentialLegendsSample />
+          <SpellingVariantsSample />
 
           <div className="text-center py-8 border-t border-gray-200">
             <p className="text-gray-600 mb-4">بازگشت به نمونه‌های پایه</p>
