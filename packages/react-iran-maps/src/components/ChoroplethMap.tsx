@@ -93,9 +93,8 @@ export function ChoroplethMap({
       .domain([minRange, maxRange])
       .range([
         colorScale[0] ?? "#fff",
-        colorScale[colorScale.length - 1] ?? "#000",
-      ])
-      .interpolate(() => interpolateRgbBasis(colorScale as string[]));
+        colorScale[colorScale.length - 1] ?? "#16898E",
+      ]);
   } else {
     legendScale = scaleQuantize<string>()
       .domain([minRange, maxRange])
@@ -127,11 +126,8 @@ export function ChoroplethMap({
             .domain([minRange, maxRange])
             .range([
               colorScale[0] ?? "#fff",
-              colorScale[colorScale.length - 1] ?? "#000",
-            ])
-            .interpolate(() => interpolateRgbBasis(colorScale as string[]))(
-            value
-          );
+              colorScale[colorScale.length - 1] ?? "#16898E",
+            ])(value);
         } else if (currentScaleType === "sequential") {
           return scaleSequential(
             interpolateRgbBasis(colorScale as string[])
